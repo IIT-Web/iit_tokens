@@ -1,0 +1,10 @@
+name = IIT Custom Tokens
+description = Provides Custom IIT token replacements
+
+core = 7.x
+package = Illinois Institute of Technology
+
+version = 7.x-1.0
+
+dependencies[] = pathauto
+files[] = iit_tokens.module

@@ -1,0 +1,53 @@
+<?php
+
+/**
+* @file
+* Provides IIT custom tokens
+*/
+
+
+/* ***************************************** */
+/* Hook Implementations                      */
+/* ***************************************** */
+
+/**
+ * Implements hook_token_info(). This hook will register the tokens.
+ */
+function iit_tokens_token_info() {
+  $info['tokens']['array']['join-path-noroot-alias'] = array(
+    'name' => t('Joined Path No Root'),
+    'description' => t('The array values minus the root element cleaned by Pathauto and then joined with the slash into a string that resembles an URL.'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_tokens(). This hook will operate the token and replace it with it's value.
+ */
+function iit_tokens_tokens($type, $tokens, array $data = array(), array $options = array()) {
+    $replacements = array();
+
+    if ($type == 'array' && !empty($data['array'])) {
+      $array = $data['array'];
+      foreach ($tokens as $name => $original) {
+        switch ($name) {
+          case 'join-path-noroot-alias':
+            module_load_include('inc', 'pathauto');
+            $values = array();
+            foreach (element_children($array) as $key) {
+              $value = is_array($array[$key]) ? render($array[$key]) : (string) $array[$key];
+              $value = pathauto_cleanstring($value);
+              $values[] = $value;
+            }
+            $values_noroot = $values;
+            array_shift($values_noroot);
+            if (count($values_noroot) > 0) {
+              $replacements[$original] = implode('/', $values_noroot);
+            }
+            break;
+        }
+      }
+    }
+
+    return $replacements;
+}
